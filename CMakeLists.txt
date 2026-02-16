@@ -15,7 +15,7 @@ add_executable(gcwireless_bridge
 	src/main.cpp
 	)
 
-pico_generate_pio_header(project ${CMAKE_CURRENT_LIST_DIR}/pio/joybus.pio)
+pico_generate_pio_header(gcwireless_bridge ${CMAKE_CURRENT_LIST_DIR}/pio/joybus.pio)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_LIST_DIR}/generated/joybus.pio.h
         DEPENDS ${CMAKE_CURRENT_LIST_DIR}/joybus.pio
