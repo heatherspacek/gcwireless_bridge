@@ -26,7 +26,7 @@ target_link_libraries(gcwireless_bridge
 	PRIVATE
 	pico_stdlib
 	# pico_bootrom
-	# pico_multicore
+	pico_multicore
 	pico_platform
 	# hardware_adc
 	# hardware_dma
