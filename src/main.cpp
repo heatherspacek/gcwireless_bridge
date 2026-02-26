@@ -79,61 +79,65 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 	return report;
 }
 
+uint8_t BUF_LEN = 10;
 
 void second_core() {
-	// this is normally where calibration, readSticks(), and processButtons() goes.
+	spi_init(spi_default, 1000*1000);
+	spi_set_slave(spi_default, true);
+	gpio_set_function(PICO_DEFAULT_SPI_RX_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(PICO_DEFAULT_SPI_SCK_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(PICO_DEFAULT_SPI_TX_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
+
+	uint8_t out_buf[BUF_LEN], in_buf[BUF_LEN];
+
 	while (true)
 	{
-		sleep_us(17); //idk, relaxation time.
-		// repeatedly read for new packets
-		//gpio_put(6, _btn.S);
-		uint8_t status1;
-		uint8_t NOP = 0xFF;
-		// cs_select();
-		spi_write_read_blocking(spi0, &NOP, &status1, 1);
+		sleep_us(10);  // superstition.
+		// spi_write_read_blocking(spi0, &NOP, &status1, 1);
 		// cs_deselect();
 		
-		if ((status1 & 0x40) == 0x40) 
+		// if ((status1 & 0x40) == 0x40) 
+		if (true)
 		{
+			spi_read_blocking(spi_default, 0x00, in_buf, BUF_LEN);
+			_btn.Ax = in_buf[0];
 			//printf("\n received one!");
 			//sleep_ms(400);
-			uint8_t read_buffer[8];
-			// read_rx_payload(read_buffer);
-			// write_register(0x07, 0b01110000); // clear interrupts
+			// uint8_t read_buffer[8];
+			// // read_rx_payload(read_buffer);
+			// // write_register(0x07, 0b01110000); // clear interrupts
 			
-			GCReport destinationreport;
-   			memcpy(&destinationreport, read_buffer , 8); 
+			// GCReport destinationreport;
+   			// memcpy(&destinationreport, read_buffer , 8); 
 
-   			_btn.A      =destinationreport.a;
-			_btn.B      =destinationreport.b;
-			_btn.X      =destinationreport.x;
-			_btn.Y      =destinationreport.y;
-			_btn.S      =destinationreport.start;
-			//_btn.orig   =0;
-			//_btn.errL   =0;
-			//_btn.errS   =0;
-			_btn.Dl     =destinationreport.dLeft;
-			_btn.Dr     =destinationreport.dRight;
-			_btn.Dd     =destinationreport.dDown;
-			_btn.Du     =destinationreport.dUp;
-			_btn.Z      =destinationreport.z;
-			_btn.R      =destinationreport.r;
-			_btn.L      =destinationreport.l;
-			//_btn.high   =1;
-			_btn.Ax     =destinationreport.xStick+1;
-			_btn.Ay     =destinationreport.yStick+1;
-			_btn.Cx     =destinationreport.cxStick+1;
-			_btn.Cy     =destinationreport.cyStick+1;
-			_btn.La     =destinationreport.analogL;
-			_btn.Ra     =destinationreport.analogR;
-
+   			// _btn.A      =destinationreport.a;
+			// _btn.B      =destinationreport.b;
+			// _btn.X      =destinationreport.x;
+			// _btn.Y      =destinationreport.y;
+			// _btn.S      =destinationreport.start;
+			// //_btn.orig   =0;
+			// //_btn.errL   =0;
+			// //_btn.errS   =0;
+			// _btn.Dl     =destinationreport.dLeft;
+			// _btn.Dr     =destinationreport.dRight;
+			// _btn.Dd     =destinationreport.dDown;
+			// _btn.Du     =destinationreport.dUp;
+			// _btn.Z      =destinationreport.z;
+			// _btn.R      =destinationreport.r;
+			// _btn.L      =destinationreport.l;
+			// //_btn.high   =1;
+			// _btn.Ax     =destinationreport.xStick+1;
+			// _btn.Ay     =destinationreport.yStick+1;
+			// _btn.Cx     =destinationreport.cxStick+1;
+			// _btn.Cy     =destinationreport.cyStick+1;
+			// _btn.La     =destinationreport.analogL;
+			// _btn.Ra     =destinationreport.analogR;
 		}
 	}
 }
 
 int main() {
-
     multicore_launch_core1(second_core);
     enterMode(_pinTX, buttonsToGCReport);
-
 }
